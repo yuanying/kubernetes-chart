@@ -1,0 +1,40 @@
+{{ if .Values.rbac.create }}
+{{- $fullName := include "kubernetes.fullname" . -}}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: {{ template "kubernetes.name" . }}
+    chart: {{ template "kubernetes.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+  name: {{ $fullName }}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/{{ required "A valid .Values.rbac.apiVersion entry required!" .Values.rbac.apiVersion }}
+metadata:
+  name: {{ $fullName }}
+  labels:
+    app: {{ template "kubernetes.name" . }}
+    chart: {{ template "kubernetes.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["create", "get", "watch", "list", "update", "delete"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/{{ required "A valid .Values.rbac.apiVersion entry required!" .Values.rbac.apiVersion }}
+metadata:
+  name: {{ $fullName }}
+subjects:
+- kind: ServiceAccount
+  name: {{ $fullName }}
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: {{ $fullName }}
+  apiGroup: rbac.authorization.k8s.io
+{{ end }}
