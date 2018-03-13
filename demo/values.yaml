@@ -1,0 +1,12 @@
+
+apiserver:
+  replicaCount: 2
+
+  service:
+    type: LoadBalancer
+    port: 443
+    loadBalancerIP: 172.18.202.101
+    clusterIP: 10.254.0.99
+
+etcdServer:
+  host: etcd-client.kubernetes.svc.cluster.local
