@@ -1,0 +1,75 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "kubernetes.fullname" . }}-apiserver
+  labels:
+    app: {{ template "kubernetes.name" . }}-apiserver
+    chart: {{ template "kubernetes.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.apiserver.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "kubernetes.name" . }}-apiserver
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "kubernetes.name" . }}-apiserver
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /hyperkube
+            - apiserver
+            - --admission-control="Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,ResourceQuota"
+            - --advertise-address=\$(POD_IP)
+            - --allow-privileged=true
+            - --authorization-mode=RBAC
+            - --bind-address=0.0.0.0
+            - --client-ca-file=/etc/kubernetes/secrets/ca.crt
+            - --etcd-servers=http://{{ .Values.etcdServer.host }}:{{ .Values.etcdServer.port }}
+            - --insecure-port=0
+            - --secure-port=443
+            - --service-account-key-file=/etc/kubernetes/secrets/service-account.pub
+            - --service-cluster-ip-range=10.254.0.0/24
+            - --storage-backend=etcd3
+            - --tls-ca-file=/etc/kubernetes/secrets/ca.crt
+            - --tls-cert-file=/etc/kubernetes/secrets/apiserver.crt
+            - --tls-private-key-file=/etc/kubernetes/secrets/apiserver.key
+            - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+            - --v=2
+          ports:
+            - name: https
+              containerPort: 443
+              protocol: TCP
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+          volumeMounts:
+            - mountPath: /etc/kubernetes/secrets
+              name: secrets
+              readOnly: true
+      volumes:
+        - name: secrets
+          secret:
+            secretName: kube-apiserver
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate

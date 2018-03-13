@@ -2,29 +2,23 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+apiserver:
+  replicaCount: 1
+
+  service:
+    type: ClusterIP
+    port: 443
+    loadBalancerIP: 172.18.201.151
+    clusterIP: 10.254.0.99
 
 image:
-  repository: nginx
-  tag: stable
+  repository: gcr.io/google_containers/hyperkube
+  tag: v1.9.2
   pullPolicy: IfNotPresent
 
-service:
-  type: ClusterIP
-  port: 80
-
-ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  path: /
-  hosts:
-    - chart-example.local
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+etcdServer:
+  host: etcd-client
+  port: 2379
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
