@@ -29,8 +29,8 @@ cat << EOF > ${KUBE_APISERVER_SECRET}
 ---
 apiVersion: v1
 data:
-  apiserver.crt: $(cat ${KUBE_APISERVER_KEY} | base64 | tr -d '\n')
-  apiserver.key: $(cat ${KUBE_APISERVER_CERT} | base64 | tr -d '\n')
+  apiserver.crt: $(cat ${KUBE_APISERVER_CERT} | base64 | tr -d '\n')
+  apiserver.key: $(cat ${KUBE_APISERVER_KEY} | base64 | tr -d '\n')
   ca.crt: $(cat ${CA_CERT} | base64 | tr -d '\n')
   service-account.pub: $(cat ${SA_PUB_KEY} | base64 | tr -d '\n')
 kind: Secret

@@ -26,8 +26,8 @@ spec:
           command:
             - /hyperkube
             - apiserver
-            - --admission-control="Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,ResourceQuota"
-            - --advertise-address=\$(POD_IP)
+            - --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,ResourceQuota
+            - --advertise-address=$(POD_IP)
             - --allow-privileged=true
             - --authorization-mode=RBAC
             - --bind-address=0.0.0.0
@@ -43,6 +43,11 @@ spec:
             - --tls-private-key-file=/etc/kubernetes/secrets/apiserver.key
             - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
             - --v=2
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           ports:
             - name: https
               containerPort: 443
