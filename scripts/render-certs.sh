@@ -29,6 +29,10 @@ KUBE_SCHEDULER_KEY=${KUBE_SCHEDULER_KEY:-"${LOCAL_KUBE_CERTS_DIR}/scheduler.key"
 KUBE_SCHEDULER_CERT_REQ=${KUBE_SCHEDULER_CERT_REQ:-"${LOCAL_KUBE_CERTS_DIR}/scheduler.csr"}
 KUBE_SCHEDULER_CERT=${KUBE_SCHEDULER_CERT:-"${LOCAL_KUBE_CERTS_DIR}/scheduler.crt"}
 
+KUBE_ADMIN_KEY=${KUBE_ADMIN_KEY:-"${LOCAL_KUBE_CERTS_DIR}/admin.key"}
+KUBE_ADMIN_CERT_REQ=${KUBE_ADMIN_CERT_REQ:-"${LOCAL_KUBE_CERTS_DIR}/admin.csr"}
+KUBE_ADMIN_CERT=${KUBE_ADMIN_CERT:-"${LOCAL_KUBE_CERTS_DIR}/admin.crt"}
+
 mkdir -p ${LOCAL_KUBE_CERTS_DIR}
 
 source ${ROOT}/render-ca.sh
@@ -46,3 +50,8 @@ export CLIENT_KEY=${KUBE_SCHEDULER_KEY}
 export CLIENT_CERT_REQ=${KUBE_SCHEDULER_CERT_REQ}
 export CLIENT_CERT=${KUBE_SCHEDULER_CERT}
 source ${ROOT}/render-client-cert.sh "/CN=system:kube-scheduler"
+
+export CLIENT_KEY=${KUBE_ADMIN_KEY}
+export CLIENT_CERT_REQ=${KUBE_ADMIN_CERT_REQ}
+export CLIENT_CERT=${KUBE_ADMIN_CERT}
+source ${ROOT}/render-client-cert.sh "/O=system:masters/CN=kubernetes-admin"
