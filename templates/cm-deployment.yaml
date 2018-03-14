@@ -1,0 +1,81 @@
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "kubernetes.fullname" . }}-cm
+  labels:
+    app: {{ template "kubernetes.name" . }}-cm
+    chart: {{ template "kubernetes.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.controllerManager.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "kubernetes.name" . }}-cm
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "kubernetes.name" . }}-cm
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: kube-controller-manager
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - ./hyperkube
+            - controller-manager
+            - --allocate-node-cidrs=true
+            - --cloud-provider=external
+            - --cluster-cidr=10.244.0.0/16
+            # FIXME(yuanying): calculate proper cidr-mask-size
+            - --node-cidr-mask-size=24
+            - --configure-cloud-routes=false
+            - --leader-elect=true
+            - --root-ca-file=/etc/kubernetes/secrets/ca.crt
+            - --use-service-account-credentials=true
+            - --service-account-private-key-file=/etc/kubernetes/secrets/service-account.key
+            - --master=https://{{ template "kubernetes.fullname" . }}
+            - --kubeconfig=/etc/kubernetes/configs/kubeconfig
+            - --v=2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 10252  # Note: Using default port. Update if --port option is set differently.
+            initialDelaySeconds: 15
+            timeoutSeconds: 15
+          volumeMounts:
+            - name: secrets
+              mountPath: /etc/kubernetes/secrets
+              readOnly: true
+            - name: configs
+              mountPath: /etc/kubernetes/configs
+              readOnly: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      volumes:
+      - name: secrets
+        secret:
+          secretName: kube-controller-manager
+      - name: configs
+        configMap:
+          name: {{ template "kubernetes.fullname" . }}-cm
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate

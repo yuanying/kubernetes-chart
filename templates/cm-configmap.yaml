@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "kubernetes.fullname" . }}-cm
+  labels:
+    app: {{ template "kubernetes.name" . }}-cm
+    chart: {{ template "kubernetes.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  kubeconfig: |
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - name: kubernetes
+      cluster:
+        certificate-authority: /etc/kubernetes/secrets/ca.crt
+        server: https://REPLACED_BY_ARGS
+    users:
+    - name: cm
+      user:
+        client-certificate: /etc/kubernetes/secrets/controller-manager.crt
+        client-key: /etc/kubernetes/secrets/controller-manager.key
+    contexts:
+    - context:
+        cluster: kubernetes
+        user: cm
+      name: cm-context
+    current-context: cm-context

@@ -46,6 +46,7 @@ data:
   controller-manager.crt: $(cat ${KUBE_CM_CERT} | base64 | tr -d '\n')
   controller-manager.key: $(cat ${KUBE_CM_KEY} | base64 | tr -d '\n')
   ca.crt: $(cat ${CA_CERT} | base64 | tr -d '\n')
+  ca.key: $(cat ${CA_KEY} | base64 | tr -d '\n')
   service-account.key: $(cat ${SA_KEY} | base64 | tr -d '\n')
 kind: Secret
 metadata:

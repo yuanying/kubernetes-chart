@@ -1,4 +1,7 @@
 
+# image:
+#   tag: v1.9.3
+
 apiserver:
   replicaCount: 2
 
