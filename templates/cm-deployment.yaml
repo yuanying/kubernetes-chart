@@ -30,6 +30,9 @@ spec:
             - --allocate-node-cidrs=true
             - --cloud-provider=external
             - --cluster-cidr=10.244.0.0/16
+            - --controllers=*,bootstrapsigner,tokencleaner
+            - --cluster-signing-cert-file=/etc/kubernetes/secrets/ca.crt
+            - --cluster-signing-key-file=/etc/kubernetes/secrets/ca.key
             # FIXME(yuanying): calculate proper cidr-mask-size
             - --node-cidr-mask-size=24
             - --configure-cloud-routes=false
