@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "kubernetes.fullname" . }}-scheduler
+  labels:
+    app: {{ template "kubernetes.name" . }}-scheduler
+    chart: {{ template "kubernetes.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  kubeconfig: |
+    apiVersion: v1
+    kind: Config
+    clusters:
+    - name: kubernetes
+      cluster:
+        certificate-authority: /etc/kubernetes/secrets/ca.crt
+        server: https://REPLACED_BY_ARGS
+    users:
+    - name: scheduler
+      user:
+        client-certificate: /etc/kubernetes/secrets/scheduler.crt
+        client-key: /etc/kubernetes/secrets/scheduler.key
+    contexts:
+    - context:
+        cluster: kubernetes
+        user: scheduler
+      name: scheduler-context
+    current-context: scheduler-context

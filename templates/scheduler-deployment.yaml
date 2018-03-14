@@ -1,0 +1,72 @@
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "kubernetes.fullname" . }}-scheduler
+  labels:
+    app: {{ template "kubernetes.name" . }}-scheduler
+    chart: {{ template "kubernetes.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.scheduler.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "kubernetes.name" . }}-scheduler
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "kubernetes.name" . }}-scheduler
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: kube-scheduler
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - ./hyperkube
+            - scheduler
+            - --leader-elect=true
+            - --master=https://{{ template "kubernetes.fullname" . }}
+            - --kubeconfig=/etc/kubernetes/configs/kubeconfig
+            - --v=2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 10251  # Note: Using default port. Update if --port option is set differently.
+            initialDelaySeconds: 15
+            timeoutSeconds: 15
+          volumeMounts:
+            - name: secrets
+              mountPath: /etc/kubernetes/secrets
+              readOnly: true
+            - name: configs
+              mountPath: /etc/kubernetes/configs
+              readOnly: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      volumes:
+      - name: secrets
+        secret:
+          secretName: kube-scheduler
+      - name: configs
+        configMap:
+          name: {{ template "kubernetes.fullname" . }}-scheduler
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate

@@ -14,6 +14,9 @@ apiserver:
 controllerManager:
   replicaCount: 1
 
+scheduler:
+  replicaCount: 1
+
 image:
   repository: gcr.io/google_containers/hyperkube
   tag: v1.9.2
