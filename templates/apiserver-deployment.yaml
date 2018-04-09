@@ -59,7 +59,7 @@ spec:
             failureThreshold: 8
             httpGet:
               path: /healthz
-              port: 6443
+              port: 443
               scheme: HTTPS
             initialDelaySeconds: 15
             timeoutSeconds: 15

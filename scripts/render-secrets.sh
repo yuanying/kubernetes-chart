@@ -22,6 +22,8 @@ export KUBE_CM_KEY=${KUBE_CM_KEY:-"${LOCAL_KUBE_CERTS_DIR}/controller-manager.ke
 export KUBE_CM_CERT=${KUBE_CM_CERT:-"${LOCAL_KUBE_CERTS_DIR}/controller-manager.crt"}
 export KUBE_SCHEDULER_KEY=${KUBE_SCHEDULER_KEY:-"${LOCAL_KUBE_CERTS_DIR}/scheduler.key"}
 export KUBE_SCHEDULER_CERT=${KUBE_SCHEDULER_CERT:-"${LOCAL_KUBE_CERTS_DIR}/scheduler.crt"}
+export KUBE_KUBELET_CLIENT_KEY=${KUBE_KUBELET_CLIENT_KEY:-"${LOCAL_KUBE_CERTS_DIR}/apiserver-kubelet-client.key"}
+export KUBE_KUBELET_CLIENT_CERT=${KUBE_KUBELET_CLIENT_CERT:-"${LOCAL_KUBE_CERTS_DIR}/apiserver-kubelet-client.crt"}
 
 mkdir -p ${LOCAL_KUBE_MANIFESTS_DIR}
 
@@ -31,6 +33,8 @@ apiVersion: v1
 data:
   apiserver.crt: $(cat ${KUBE_APISERVER_CERT} | base64 | tr -d '\n')
   apiserver.key: $(cat ${KUBE_APISERVER_KEY} | base64 | tr -d '\n')
+  apiserver-kubelet-client.crt: $(cat ${KUBE_KUBELET_CLIENT_CERT} | base64 | tr -d '\n')
+  apiserver-kubelet-client.key: $(cat ${KUBE_KUBELET_CLIENT_KEY} | base64 | tr -d '\n')
   ca.crt: $(cat ${CA_CERT} | base64 | tr -d '\n')
   service-account.pub: $(cat ${SA_PUB_KEY} | base64 | tr -d '\n')
 kind: Secret
