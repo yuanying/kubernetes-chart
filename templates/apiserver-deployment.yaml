@@ -28,7 +28,13 @@ spec:
             - apiserver
             - --enable-bootstrap-token-auth=true
             - --admission-control=NamespaceLifecycle,LimitRanger,ServiceAccount,PersistentVolumeLabel,DefaultStorageClass,DefaultTolerationSeconds,NodeRestriction,ResourceQuota
+            {{- if .Values.apiserver.advertiseAddress }}
+            - --advertise-address={{ .Values.apiserver.advertiseAddress }}
+            {{- else if and (eq .Values.apiserver.service.type "LoadBalancer") .Values.apiserver.service.loadBalancerIP }}
+            - --advertise-address={{ .Values.apiserver.service.loadBalancerIP }}
+            {{- else }}
             - --advertise-address=$(POD_IP)
+            {{- end }}
             - --allow-privileged=true
             - --authorization-mode=Node,RBAC
             - --bind-address=0.0.0.0

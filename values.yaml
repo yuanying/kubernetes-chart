@@ -8,7 +8,7 @@ apiserver:
   service:
     type: ClusterIP
     port: 443
-    loadBalancerIP: 172.18.201.151
+    #loadBalancerIP: 172.18.201.151
     clusterIP: 10.254.0.99
 
 controllerManager:
