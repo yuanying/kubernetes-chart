@@ -39,7 +39,7 @@ spec:
             - --authorization-mode=Node,RBAC
             - --bind-address=0.0.0.0
             - --client-ca-file=/etc/kubernetes/secrets/ca.crt
-            - --etcd-servers=http://{{ .Values.etcdServer.host }}:{{ .Values.etcdServer.port }}
+            - --etcd-servers=http://{{ template "kubernetes.fullname" . }}-etcd-client:2379
             - --insecure-port=0
             - --secure-port=443
             - --service-account-key-file=/etc/kubernetes/secrets/service-account.pub

@@ -22,9 +22,9 @@ image:
   tag: v1.9.2
   pullPolicy: IfNotPresent
 
-etcdServer:
-  host: etcd-client
-  port: 2379
+etcdCluster:
+  replicaCount: 1
+  version: "3.2.13"
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

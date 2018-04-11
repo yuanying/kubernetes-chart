@@ -37,4 +37,5 @@ metadata:
 type: bootstrap.kubernetes.io/token
 EOF
 
-echo "kubeadm join --token ${TOKEN_ID}.${TOKEN_SECRET} ${KUBE_API_SERVICE_EXTERNAL_IP}:443"
+echo
+echo "kubeadm join --token ${TOKEN_ID}.${TOKEN_SECRET} ${KUBE_API_SERVICE_EXTERNAL_IP}:443 --discovery-token-unsafe-skip-ca-verification"
