@@ -19,7 +19,7 @@ scheduler:
 
 image:
   repository: gcr.io/google_containers/hyperkube
-  tag: v1.9.2
+  tag: v1.9.6
   pullPolicy: IfNotPresent
 
 etcdCluster:
