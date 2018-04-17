@@ -6,13 +6,14 @@ export LC_ALL=C
 ROOT=$(dirname "${BASH_SOURCE}")
 LOCAL_KUBE_MANIFESTS_DIR="${ROOT}/../../manifests"
 KUBE_API_SERVICE_EXTERNAL_IP=${KUBE_API_SERVICE_EXTERNAL_IP:-"192.168.11.101"}
+KUBE_API_SERVICE_EXTERNAL_FQDN=${KUBE_API_SERVICE_EXTERNAL_FQDN:-${KUBE_API_SERVICE_EXTERNAL_IP}}
 
 export KUBE_CONFIG=${KUBE_ADMIN_KUBECONFIG:-"${LOCAL_KUBE_MANIFESTS_DIR}/admin.yaml"}
 
 # FIXME(yuanying): Make following code work with Linux
 TOKEN_EXPIRATION_DATE=$(date -v +2d -u +"%Y-%m-%dT%H:%M:%SZ")
-TOKEN_ID=$(openssl rand -hex 3)
-TOKEN_SECRET=$(openssl rand -hex 8)
+TOKEN_ID=${KUBE_PROVIDED_TOKEN_ID:-$(openssl rand -hex 3)}
+TOKEN_SECRET=${KUBE_PROVIDED_TOKEN_SECRET:-$(openssl rand -hex 8)}
 
 ENCODED_TOKEN_EXPIRATION_DATE=$(echo -n "${TOKEN_EXPIRATION_DATE}" | base64 | tr -d '\n')
 ENCODED_TOKEN_ID=$(echo -n "${TOKEN_ID}" | base64 | tr -d '\n')
@@ -38,4 +39,4 @@ type: bootstrap.kubernetes.io/token
 EOF
 
 echo
-echo "kubeadm join --token ${TOKEN_ID}.${TOKEN_SECRET} ${KUBE_API_SERVICE_EXTERNAL_IP}:443 --discovery-token-unsafe-skip-ca-verification"
+echo "kubeadm join --token ${TOKEN_ID}.${TOKEN_SECRET} ${KUBE_API_SERVICE_EXTERNAL_FQDN}:443 --discovery-token-unsafe-skip-ca-verification"
