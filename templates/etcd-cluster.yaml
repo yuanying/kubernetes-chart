@@ -2,15 +2,15 @@ apiVersion: "etcd.database.coreos.com/v1beta2"
 kind: "EtcdCluster"
 metadata:
   name: {{ template "kubernetes.fullname" . }}-etcd
-  # Adding this annotation make this cluster managed by clusterwide operators
-  # namespaced operators ignore it
   labels:
     app: {{ template "kubernetes.name" . }}-etcd
     chart: {{ template "kubernetes.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
+{{- with .Values.etcdCluster.annotations }}
   annotations:
-    etcd.database.coreos.com/scope: clusterwide
+{{ toYaml . | indent 4 }}
+{{- end }}
 spec:
   size: {{ .Values.etcdCluster.replicaCount }}
   version: {{ .Values.etcdCluster.version }}

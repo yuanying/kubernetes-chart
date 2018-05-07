@@ -23,8 +23,10 @@ image:
   pullPolicy: IfNotPresent
 
 etcdCluster:
-  replicaCount: 1
+  size: 1
   version: "3.2.13"
+  annotations: {}
+  # etcd.database.coreos.com/scope: clusterwide
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
